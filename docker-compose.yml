@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:latest
+    container_name: kaspersky_task_redis
+    expose:
+      - "6379"
+
+  django_and_worker:
+    build: .
+    command: supervisord -c supervisord.conf
+    container_name: kaspersky_task_django
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - "8000:8000"
+    expose:
+      - "6379"
+    depends_on:
+      - redis
