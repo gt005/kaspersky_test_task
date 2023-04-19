@@ -18,7 +18,7 @@ def make_search(create_request: dict) -> list[str]:
     :param create_request: Параметры, заданные условием задачи
     :return: Список всех путей к файлам, удовлетворяющих заданным параметрам
     """
-    sleep(5)
+    sleep(20)
 
     return [
         'test_path_1/' + str(uuid4()),
@@ -46,6 +46,9 @@ def add_paths_to_db_and_finish_search(job: Job, connection, result: list[str],
 
     for path in result:
         search_task_object.paths.create(path=path).save()
+
+    search_task_object.finished = True
+    search_task_object.save()
 
 
 def make_async_searcher(create_request: dict) -> 'Job':
