@@ -4,11 +4,11 @@ from redis import Redis
 from rq import Queue
 from rq.job import Job
 
-from kaspersky_file_api.main.models import Search
-from search_functions import make_search
+from ..models import Search
+from .search_functions import make_search
 
 q = Queue(connection=Redis(host=os.getenv('REDIS_HOST', 'localhost')))
-ABSOLUTE_PATH_TO_FIND_DIR = os.getenv('DIRECTORY_TO_FIND_FILES')
+ABSOLUTE_PATH_TO_FIND_DIR = os.getenv('ABSOLUTE_PATH_TO_FIND_DIR')
 
 
 def add_paths_to_db_and_finish_search(job: Job, connection, result: list[str],
@@ -34,10 +34,10 @@ def add_paths_to_db_and_finish_search(job: Job, connection, result: list[str],
     search_task_object.save()
 
 
-def make_async_searcher(create_request: dict) -> Job:
+def make_async_searcher(file_find_criteria: dict) -> Job:
     """ Создает объект поиска и запускает асинхронный поиск файлов по заданным
         параметрам
-    :param create_request: Параметры, заданные условием задачи
+    :param file_find_criteria: Параметры, заданные условием задачи
     :return: Объект задачи
     """
     if ABSOLUTE_PATH_TO_FIND_DIR is None:
@@ -47,7 +47,8 @@ def make_async_searcher(create_request: dict) -> Job:
     # сохраняем результат в БД и изменяем статус поиска на "завершен"
     result = q.enqueue(
         make_search,
-        create_request,
+        ABSOLUTE_PATH_TO_FIND_DIR,
+        file_find_criteria,
         on_success=add_paths_to_db_and_finish_search
     )
 

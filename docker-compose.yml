@@ -13,8 +13,8 @@ services:
     container_name: kaspersky_task_django
     environment:
       - REDIS_HOST=redis
-      - DEBUG=False
-      - ABSOLUTE_PATH_TO_FIND_DIR=/Users/karimhamid/PycharmProjects/kasperskyFileTask/test_directory
+      - DEBUG=True
+      - ABSOLUTE_PATH_TO_FIND_DIR=/kaspersky_app/test_directory/
     ports:
       - "8000:8000"
     expose:

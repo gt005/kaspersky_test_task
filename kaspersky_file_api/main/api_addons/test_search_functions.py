@@ -54,7 +54,7 @@ class SearchFunctionsTestCase(unittest.TestCase):
             make_search(
                 root_path,
                 {
-                    'text': 'a',
+                    'text': 'Hello, World',
                 }
             ), [
                 '../../../test_directory/file_3de853da-0616-4bc4-90b3-e3a96b5c628d',
