@@ -13,3 +13,6 @@ Redis worker настроен в файле `kaspersky_file_api/worker.py`
 Все API лежат в `kaspersky_file_api/main/views.py`
 
 Логика поиска файлов и работы с бд лежит в `kaspersky_file_api/main/api_addons/search_handlers.py`
+
+Файлы для тестов (тесты запускать в той же директории что и файл) лежат в:
+* Функций поиска: `kaspersky_file_api/main/api_addons/test_search_functions.py` (запуск `python3 -m unittest`)

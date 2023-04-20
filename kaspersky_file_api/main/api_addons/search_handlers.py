@@ -1,36 +1,19 @@
-from time import sleep
-from uuid import uuid4
-
 import os
 
 from redis import Redis
 from rq import Queue
 from rq.job import Job
 
-from ..models import Search
+from kaspersky_file_api.main.models import Search
+from search_functions import make_search
 
 q = Queue(connection=Redis(host=os.getenv('REDIS_HOST', 'localhost')))
-
-
-def make_search(create_request: dict) -> list[str]:
-    """ Выполняет поиск файлов по заданным параметрам
-
-    :param create_request: Параметры, заданные условием задачи
-    :return: Список всех путей к файлам, удовлетворяющих заданным параметрам
-    """
-    sleep(20)
-
-    return [
-        'test_path_1/' + str(uuid4()),
-        'test_path_2/' + str(uuid4()),
-        'test_path_3/' + str(uuid4()),
-    ]
+ABSOLUTE_PATH_TO_FIND_DIR = os.getenv('DIRECTORY_TO_FIND_FILES')
 
 
 def add_paths_to_db_and_finish_search(job: Job, connection, result: list[str],
                                       *args, **kwargs) -> None:
-    """
-        Предназначен для вызова в качетсве on_success callback redis.
+    """ Предназначен для вызова в качетсве on_success callback redis.
         Вызывается после завершения поиска файлов по заданным параметрам.
         Сохраняет результат в БД и изменяет статус поиска на "завершен".
 
@@ -51,12 +34,15 @@ def add_paths_to_db_and_finish_search(job: Job, connection, result: list[str],
     search_task_object.save()
 
 
-def make_async_searcher(create_request: dict) -> 'Job':
+def make_async_searcher(create_request: dict) -> Job:
     """ Создает объект поиска и запускает асинхронный поиск файлов по заданным
         параметрам
     :param create_request: Параметры, заданные условием задачи
     :return: Объект задачи
     """
+    if ABSOLUTE_PATH_TO_FIND_DIR is None:
+        raise ValueError("ABSOLUTE_PATH_TO_FIND_DIR is not set")
+
     # Запускаем асинхронный поиск файлов по параметрам и после завершения
     # сохраняем результат в БД и изменяем статус поиска на "завершен"
     result = q.enqueue(
@@ -69,3 +55,4 @@ def make_async_searcher(create_request: dict) -> 'Job':
         Search(tag=str(result.id)).save()
 
     return result
+
