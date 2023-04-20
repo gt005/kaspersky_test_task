@@ -7,17 +7,36 @@ services:
     expose:
       - "6379"
 
+  db:
+    image: postgres:latest
+    container_name: kaspersky_task_postgres
+    environment:
+      - POSTGRES_USER=gt005
+      - POSTGRES_PASSWORD=SuperSecretPassword3197
+      - POSTGRES_DB=kaspersky_task_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - "5432"
+
   django_and_worker:
     build: .
-    command: supervisord -c supervisord.conf
+    entrypoint: ./django_entrypoint.sh
     container_name: kaspersky_task_django
     environment:
       - REDIS_HOST=redis
       - DEBUG=False
       - ABSOLUTE_PATH_TO_FIND_DIR=/kaspersky_app/test_directory/
+      - POSTGRES_USER=gt005
+      - POSTGRES_PASSWORD=SuperSecretPassword3197
+      - POSTGRES_DB=kaspersky_task_database
     ports:
       - "8000:8000"
     expose:
       - "6379"
     depends_on:
       - redis
+      - db
+
+volumes:
+  postgres_data:

@@ -79,8 +79,12 @@ WSGI_APPLICATION = 'kaspersky_file_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', 'kaspersky_task_database'),
+        'USER': os.environ.get('POSTGRES_USER', 'gt005'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'SuperSecretPassword3197'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
